@@ -10,8 +10,17 @@
   "license": "ISC",
   "dependencies": {
     "boom": "^7.3.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "s": "^1.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/deanWinnie/admin-imooc-node.git"
+  },
+  "bugs": {
+    "url": "https://github.com/deanWinnie/admin-imooc-node/issues"
+  },
+  "homepage": "https://github.com/deanWinnie/admin-imooc-node#readme",
   "description": ""
 }

@@ -1,7 +1,13 @@
 const express =require("express");
 const router =require('./router')
+const bodyParser = require('body-parser')
+const cors = require('cors')
+
 const app =express()
 
+app.use(cors())//用作跨域
+app.use(bodyParser.urlencoded({extended:true}))
+app.use(bodyParser.json())
 app.use("/",router)
 // function myLogger(req,res,next){
 //     console.log("Mylogger")
