@@ -23,7 +23,7 @@ function querySql(sql) {
                     debug && console.log('查询失败，原因:' + JSON.stringify(err))
                     reject(err)
                 }else{
-                    debug && console.log('查询成功', JSON.stringify(results))
+                    debug && console.log('查询成功', JSON.stringify(res))
                     resolve(res)
                 }
             })
