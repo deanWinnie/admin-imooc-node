@@ -3,4 +3,6 @@ module.exports = {
   CODE_SUCCESS: 0,
   debug:true,
   PWD_SALT: 'admin_imooc_node',
+  PRIVATE_KEY:'mywen_deanwinnie',
+  JWT_EXPIRED:60 * 60
 }

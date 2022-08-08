@@ -4,7 +4,8 @@ const {querySql} =require('../db')
 const {login} = require('../services/user')
 const {md5} = require('../utils')
 const boom = require('boom')
-const { PWD_SALT } = require('../utils/constant')
+const jwt = require('jsonwebtoken')
+const { PWD_SALT,PRIVATE_KEY,JWT_EXPIRED} = require('../utils/constant')
 const {body, validationResult} = require('express-validator')
 
 const router = express.Router()
@@ -28,7 +29,12 @@ router.post('/login',
       if(!user || user.length == 0){
           new Result('登录失败').fail(res)
       }else{
-          new Result('登录成功').success(res)
+        const token = jwt.sign(
+          {username},
+          PRIVATE_KEY,
+          {expiresIn:JWT_EXPIRED}
+        )
+          new Result({token},'登录成功').success(res)
       }
     })
   }
