@@ -12,7 +12,7 @@ function connect(){
     })
 }
 
-
+//查询多个用户，返回一个数组
 function querySql(sql) {
     const conn = connect()
     debug && console.log(sql)
@@ -35,6 +35,22 @@ function querySql(sql) {
     })
 }
 
+//查询单条数据，返回一个数组
+function queryOne(sql) {
+  return new Promise((resolve,reject) =>{
+    querySql(sql).then(res =>{
+      if(res && res.length > 0){
+        resolve(res[0])
+      }else{
+        resolve(null)
+      }
+    }).catch(err =>{
+      reject(err)
+    })
+  })
+}
+
 module.exports = {
-    querySql
+    querySql,
+    queryOne
 }

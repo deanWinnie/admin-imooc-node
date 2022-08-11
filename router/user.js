@@ -1,8 +1,8 @@
 const express = require('express')
 const Result = require('../models/Result')
 const {querySql} =require('../db')
-const {login} = require('../services/user')
-const {md5} = require('../utils')
+const {login,findUser} = require('../services/user')
+const {md5,decoded} = require('../utils')
 const boom = require('boom')
 const jwt = require('jsonwebtoken')
 const { PWD_SALT,PRIVATE_KEY,JWT_EXPIRED} = require('../utils/constant')
@@ -40,7 +40,20 @@ router.post('/login',
   }
 })
 router.get('/info', function(req, res, next) {
-    res.json('user info...')
+  const decode =decoded(req)
+  if(decode && decode.username){
+    findUser(decode.username).then(user =>{
+      console.log(user)
+      if(user){
+        user.roles = [user.role]
+        new Result(user,'用户信息查询成功').success(res)
+      }else{
+        new Result('用户信息查询失败').fail(res)
+      }
+    })
+  }else{
+    new Result('用户信息查询失败').fail(res)
+  }
 })
 
 module.exports = router

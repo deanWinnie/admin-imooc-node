@@ -30,6 +30,7 @@ app.use("/",router)
 // app.use(errorHandler)
 
 const server = app.listen(5000,function(){
+    console.log(server.address())
     const{address,port}=server.address()
     console.log('HTTP服务启动成功 http://%s:%s',address,port);
 })
