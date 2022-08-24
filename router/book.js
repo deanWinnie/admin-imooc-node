@@ -2,7 +2,9 @@ const express = require('express')
 const multer = require('multer')
 const {UPLOAD_PATH} =require('../utils/constant')
 const Result = require('../models/Result')
+const Book = require('../models/Book')
 const router = express.Router()
+const boom = require('boom')
 
 router.post(
   '/upload',
@@ -11,7 +13,12 @@ router.post(
     if(!req.file || req.file.length ===0){
       new Result('上传电子书失败').fail(res)
     }else{
-      new Result('上传电子书成功').success(res)
+      const book = new Book(req.file)
+      book.parse().then(book =>{
+        new Result('上传电子书成功').success(res)
+      }).catch(err =>{
+        next(boom.badImplementation(err))
+      })
     }
   }
 )
