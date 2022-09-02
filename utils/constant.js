@@ -9,7 +9,7 @@ module.exports = {
   debug:true,
   PWD_SALT: 'admin_imooc_node',
   PRIVATE_KEY:'mywen_deanwinnie',
-  JWT_EXPIRED:60 * 60,
+  JWT_EXPIRED:60 * 60*24,
   UPLOAD_PATH,
   UPLOAD_URL,
   MIME_TYPE_EPUB:'application/epub'

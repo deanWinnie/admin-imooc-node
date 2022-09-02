@@ -12,7 +12,7 @@ class Book{
     }
   }
   createBookFromFile(file){
-    console.log('createBookFromFile',file)
+    // console.log('createBookFromFile',file)
     const {
       destination,
       path,
@@ -47,6 +47,7 @@ class Book{
     this.author = '' //作者
     this.publisher = ''  //出版社
     this.contents = [] //目录
+    this.contentsTree = [] //树装目录结构
     this.cover = '' //封面图片URL
     this.coverPath = '' //封面图片的路径
     this.category = -1 //分类ID
@@ -73,7 +74,6 @@ class Book{
         if(err){
           reject(err)
         }else{
-          console.log(epub.metadata)
           const {
             language,
             creator,
@@ -82,7 +82,6 @@ class Book{
             cover,
             publisher
           } =epub.metadata
-          console.log('cover',epub.metadata)
           if(!title){
             reject(new Error('图书标题为空'))
           }else{
@@ -106,8 +105,9 @@ class Book{
             }
             try{
               this.unzip()
-              this.parseContents(epub).then(({chapters}) =>{
+              this.parseContents(epub).then(({chapters,chapterTree}) =>{
                 this.contents = chapters
+                this.contentsTree = chapterTree
               })
               epub.getImage(cover,handleGetImage)
             } catch(e){
@@ -174,31 +174,32 @@ class Book{
             reject(err)
           }else{
            const navMap = json.ncx.navMap
-           console.log('xml',navMap)
            if(navMap.navPoint && navMap.navPoint.length > 0){
             navMap.navPoint = findParent(navMap.navPoint)
             const newNavMap = flatten(navMap.navPoint)
             const chapters = []
-            epub.flow.forEach((chapter,index) =>{
-              if(index + 1 >newNavMap.length){
-                return
-              }
-              const nav = newNavMap[index]
+            newNavMap.forEach((chapter,index) =>{
+              const src = chapter.content['$'].src
               chapter.text = `${UPLOAD_URL}/unzip/${filename}/${chapter.href}`
-              if(nav && nav.navLabel){
-                chapter.label = nav.navLabel.text || ''
-              }else{
-                chapter.label = ''
-              }
-              chapter.level = nav.level
-              chapter.pid = nav.pid
-              chapter.navId = nav['$'].id
+              chapter.label = chapter.navLabel.text || ''
+              chapter.navId = chapter['$'].id
               chapter.filename = filename
               chapter.order = index+1
-              //console.log(chapter)
               chapters.push(chapter)
             })
-            resolve({chapters})
+            const chapterTree = []
+            console.log('nav',newNavMap)
+            chapters.forEach(c=>{
+              c.children = []
+              if(c.pid === ''){
+                chapterTree.push(c)
+              }else{
+                const parent = chapters.find( _ => _.navId === c.pid
+                )
+                parent.children.push(c)
+              }
+            })
+            resolve({chapters,chapterTree})
            }else{
             reject(new Error('目录解析失败，目录数为0'))
            }
