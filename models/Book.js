@@ -1,6 +1,6 @@
 const { MIME_TYPE_EPUB ,UPLOAD_URL, UPLOAD_PATH} =require('../utils/constant')
 const fs = require('fs')
-const { resolve } = require('path')
+const path  = require('path')
 const EPub = require('../utils/epub')
 const xml2js = require('xml2js').parseString
 class Book{
@@ -58,7 +58,24 @@ class Book{
   }
   
   createBookFromData(data) {
-  
+    this.fileName = data.fileName
+    this.cover = data.cover
+    this.title = data.title
+    this.author = data.author
+    this.publisher = data.publisher
+    this.bookId = data.fileName
+    this.language = data.language
+    this.originalName = data.originalName
+    this.path = data.path || data.filePath
+    this.filePath = data.path || data.filePath
+    this.unzipPath = data.unzipPath
+    this.coverPath = data.coverPath
+    this.createUser = data.username
+    this.createDt = new Date().getTime()
+    this.updateDt = new Date().getTime()
+    this.updateType = data.updateType === 0?data.updateType:1
+    this.category = data.category || 99
+    this.categoryText = data.categoryText || '自定义'
   }
   parse(){
     return new Promise((resolve,reject) =>{
@@ -165,6 +182,9 @@ class Book{
     if(fs.existsSync(ncxFilePath)){
       return new Promise((resolve,reject) =>{
         const xml = fs.readFileSync(ncxFilePath,'utf-8')
+        console.log('dir',path.dirname(ncxFilePath))
+        path.d
+        const dir = path.dirname(ncxFilePath).replace(UPLOAD_PATH,'')
         const filename = this.filename
         xml2js(xml,{
           explicitArray:false,
@@ -180,7 +200,7 @@ class Book{
             const chapters = []
             newNavMap.forEach((chapter,index) =>{
               const src = chapter.content['$'].src
-              chapter.text = `${UPLOAD_URL}/unzip/${filename}/${chapter.href}`
+              chapter.text = `${UPLOAD_URL}${dir}/${src}`
               chapter.label = chapter.navLabel.text || ''
               chapter.navId = chapter['$'].id
               chapter.filename = filename

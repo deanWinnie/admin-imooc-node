@@ -5,6 +5,8 @@ const Result = require('../models/Result')
 const Book = require('../models/Book')
 const router = express.Router()
 const boom = require('boom')
+const {decoded} = require('../utils')
+const bookService = require('../services/book')
 
 router.post(
   '/upload',
@@ -21,6 +23,23 @@ router.post(
         next(boom.badImplementation(err))
       })
     }
+  }
+)
+
+router.post(
+  '/create',
+  function(req,res,next){
+    const decode = decoded(req)
+    if(decode && decode.username){
+      req.body.username = decode.username
+    }
+    const book = new Book(null,req.body)
+    console.log(book)
+    bookService.insertBook(book).then(() =>{
+
+    }).catch(err =>{
+      next(boom.badImplementation(err))
+    })
   }
 )
 
