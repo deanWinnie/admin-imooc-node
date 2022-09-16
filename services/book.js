@@ -1,20 +1,22 @@
 const Book = require("../models/Book")
 const db =require('../db')
 
-function exists(){}
+function exists(){
+  return false
+}
 function removeBook(){}
 function insertContents(){}
 function insertBook(book){
-  return new Promise((resolve,reject) =>{
+  return new Promise(async(resolve,reject) =>{
     try{
       if(book instanceof Book){
-        const res =exists(book)
+        const res =await exists(book)
         if(res){
-          removeBook(nook)
+          await removeBook(nook)
           reject(new Error('电子书已存在'))
         }else{
-          db.insert(book,'book')
-          insertContents(book)
+          await db.insert(book.toDb(),'book')
+          await insertContents(book)
           resolve()
         }
       }else{

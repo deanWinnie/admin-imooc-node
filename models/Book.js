@@ -58,12 +58,12 @@ class Book{
   }
   
   createBookFromData(data) {
-    this.fileName = data.fileName
+    this.filename = data.filename
     this.cover = data.cover
     this.title = data.title
     this.author = data.author
     this.publisher = data.publisher
-    this.bookId = data.fileName
+    this.bookId = data.filename
     this.language = data.language
     this.originalName = data.originalName
     this.path = data.path || data.filePath
@@ -114,7 +114,7 @@ class Book{
                 const suffix = mimeType.split('/')[1]
                 const coverPath = `${UPLOAD_PATH}/img/${this.filename}.${suffix}`
                 const coverUrl = `${UPLOAD_URL}/img/${this.filename}.${suffix}`
-                this.coverPath = `/img/${this.fileName}.${suffix}`
+                this.coverPath = `/img/${this.filename}.${suffix}`
                 this.cover = coverUrl
                 fs.writeFileSync(coverPath,file,'binary')
                 resolve(this)
@@ -231,6 +231,27 @@ class Book{
     }
   }
 
+  toDb(){
+    return{
+      filename:this.filename,
+      cover:this.cover,
+      title:this.title,
+      author:this.author,
+      publisher:this.publisher,
+      bookId:this.filename,
+      language:this.language,
+      originalName:this.originalName,
+      filePath:this.path || this.filePath,
+      unzipPath:this.unzipPath,
+      coverPath:this.coverPath,
+      createUser:this.createUser,
+      createDt:this.createDt,
+      updateDt:this.updateDt,
+      updateType:this.updateType,
+      category:this.category,
+      categoryText:this.categoryText
+    }
+  }
   static genPath(path){
     if(!path.startsWith('/')){
       path = `/${path}`
