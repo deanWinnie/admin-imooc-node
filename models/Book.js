@@ -2,6 +2,7 @@ const { MIME_TYPE_EPUB ,UPLOAD_URL, UPLOAD_PATH} =require('../utils/constant')
 const fs = require('fs')
 const path  = require('path')
 const EPub = require('../utils/epub')
+const { get } = require('http')
 const xml2js = require('xml2js').parseString
 class Book{
   constructor(file,data) {
@@ -76,6 +77,7 @@ class Book{
     this.updateType = data.updateType === 0?data.updateType:1
     this.category = data.category || 99
     this.categoryText = data.categoryText || '自定义'
+    this.contents = data.contents || []
   }
   parse(){
     return new Promise((resolve,reject) =>{
@@ -182,10 +184,9 @@ class Book{
     if(fs.existsSync(ncxFilePath)){
       return new Promise((resolve,reject) =>{
         const xml = fs.readFileSync(ncxFilePath,'utf-8')
-        console.log('dir',path.dirname(ncxFilePath))
-        path.d
         const dir = path.dirname(ncxFilePath).replace(UPLOAD_PATH,'')
         const filename = this.filename
+        const unzipPath = this.unzipPath
         xml2js(xml,{
           explicitArray:false,
           ignoreAttrs:false
@@ -200,6 +201,8 @@ class Book{
             const chapters = []
             newNavMap.forEach((chapter,index) =>{
               const src = chapter.content['$'].src
+              chapter.id = `${src}`
+              chapter.href = `${dir}/${src}`.replace(unzipPath,'')
               chapter.text = `${UPLOAD_URL}${dir}/${src}`
               chapter.label = chapter.navLabel.text || ''
               chapter.navId = chapter['$'].id
@@ -208,7 +211,7 @@ class Book{
               chapters.push(chapter)
             })
             const chapterTree = []
-            console.log('nav',newNavMap)
+            //console.log('nav',newNavMap)
             chapters.forEach(c=>{
               c.children = []
               if(c.pid === ''){
@@ -251,6 +254,9 @@ class Book{
       category:this.category,
       categoryText:this.categoryText
     }
+  }
+  getContents(){
+    return this.contents
   }
   static genPath(path){
     if(!path.startsWith('/')){
