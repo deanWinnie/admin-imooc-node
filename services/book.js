@@ -2,10 +2,22 @@ const Book = require("../models/Book")
 const db =require('../db')
 const _ = require('lodash')
 
-function exists(){
-  return false
+function exists(book){
+  const { title,author,publisher } = book
+  const sql = `select * from book where title='${title}' and author='${author}' and publisher='${publisher}'`
+  return db.queryOne(sql)
 }
-function removeBook(book){}
+async function removeBook(book){
+  if(book){
+    book.reset()
+    if(book.filename){
+      const removeBookSql = `delete from book where filename='${book.filename}'`
+      const removeContentsSql = `delete from contents where filename='${book.filename}'`
+      await db.querySql(removeBookSql)
+      await db.querySql(removeContentsSql)
+    }
+  }
+}
 async function insertContents(book){
   const contents = book.getContents()
   if(contents && contents.length > 0){
@@ -31,7 +43,7 @@ function insertBook(book){
       if(book instanceof Book){
         const res =await exists(book)
         if(res){
-          await removeBook(nook)
+          await removeBook(book)
           reject(new Error('电子书已存在'))
         }else{
           await db.insert(book.toDb(),'book')
@@ -47,6 +59,16 @@ function insertBook(book){
   })
 }
 
+function getBook(filename){
+  return new Promise(async(resolve,reject)=>{
+    const bookSql = `select * from book where filename='${filename}'`
+    const contentsSql = `select * from contents where filename='${filename}' order by \`order\``
+    const book = await db.queryOne(bookSql)
+    const contents = await db.queryOne(contentsSql)
+    resolve(book)
+  })
+}
 module.exports = {
-  insertBook
+  insertBook,
+  getBook
 }

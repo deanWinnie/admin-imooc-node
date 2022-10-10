@@ -43,4 +43,20 @@ router.post(
   }
 )
 
+router.get(
+  '/get',
+  (req,res,next)=>{
+    const {filename} =req.query
+    if(!filename){
+      next(boom.badRequest(new Error('参数filename不能为空')))
+    }else{
+      bookService.getBook(filename).then(book=>{
+        new Result(book,'获取图书信息成功').success(res)
+      }).catch(err=>{
+        next(boom.badImplementation(err))
+      })
+    }
+  }
+)
+
 module.exports = router

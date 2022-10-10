@@ -258,11 +258,37 @@ class Book{
   getContents(){
     return this.contents
   }
+  /**
+   * 删除文件
+   */
+  reset(){
+    if(Book.pathExists(this.filePath)){
+      fs.unlinkSync(Book.genPath(this.filePath))
+    }
+    if(Book.pathExists(this.coverPath)){
+      fs.unlinkSync(Book.genPath(this.coverPath))
+    }
+    if(Book.pathExists(this.unzipPath)){
+      //删除文件夹的时候需要使用rmdirSync
+      fs.rmdirSync(Book.genPath(this.unzipPath),{recursive:true})
+    }
+  }
   static genPath(path){
     if(!path.startsWith('/')){
       path = `/${path}`
     }
     return `${UPLOAD_PATH}${path}`
+  }
+  /**
+   * 
+   * 判断路径是否存在
+   */
+  static pathExists(path){
+    if(path.startsWith(UPLOAD_PATH)){
+      return fs.existsSync(path)
+    }else{
+      return fs.existsSync(Book.genPath(path))
+    }
   }
 }
 
